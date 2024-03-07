@@ -68,10 +68,10 @@ function Engine(
     m::Model, 
     d::Data,
     modes::Tuple{Vararg{EngineMode}},
+    phys::PhysicsState
 )    
 
-    # Store physics sate and visualisation interface
-    phys = PhysicsState(m, d)
+    # Store visualisation interface
     ui = UIState()
 
     # Create the window and manager

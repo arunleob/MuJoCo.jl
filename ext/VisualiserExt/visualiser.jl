@@ -3,21 +3,23 @@
 function MuJoCo.Visualiser.visualise!(
     m::Model, d::Data; 
     controller = nothing, 
-    trajectories = nothing
+    trajectories = nothing,
+    channel::Channel = nothing
 )
     modes = EngineMode[]
     !isnothing(controller) && push!(modes, Controller(controller))
     !isnothing(trajectories) && push!(modes, Trajectory(trajectories))
     push!(modes, PassiveDynamics())
 
-    run!(Engine(default_windowsize(), m, d, Tuple(modes)))
-    return nothing
+    phys = PhysicsState(m, d)
+    rendertask = Threads.@spawn run!(Engine(default_windowsize(), m, d, Tuple(modes), phys), channel = channel)
+    return phys, rendertask
 end
 
 """
 Run the visualiser engine
 """
-function run!(e::Engine)
+function run!(e::Engine; channel::Channel = nothing)
 
     # Render the first frame before opening window
     prepare!(e)
@@ -33,7 +35,7 @@ function run!(e::Engine)
     println("Press \"F1\" to show the help message.")
 
     # Run the visuals
-    runui!(e)
+    runui!(e, channel = channel)
     wait(modetask)
     return nothing
 end
@@ -41,7 +43,7 @@ end
 """
 Run the UI
 """
-function runui!(e::Engine)
+function runui!(e::Engine; channel::Channel = nothing)
     shouldexit = false
     trecord = 0.0
     try
@@ -71,6 +73,12 @@ function runui!(e::Engine)
                 trecord = tnow
                 recordframe(e)
             end
+
+            # Check for external signals
+            if channel != nothing && isready(channel)
+                shouldexit = take!(channel)
+            end
+
             yield() # Visualisation should give way to running the physics model
         end
     finally
