@@ -20,7 +20,10 @@ end
 Run the visualiser engine
 """
 function run!(e::Engine; channel::Channel = nothing)
-
+    # Have shadows and reflection off by default
+    _toggle!(e.ui.scn.flags, 1) #Shadow
+    _toggle!(e.ui.scn.flags, 3) #Reflections
+    
     # Render the first frame before opening window
     prepare!(e)
     e.ui.refreshrate = GetRefreshRate()
