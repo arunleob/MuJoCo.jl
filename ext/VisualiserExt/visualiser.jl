@@ -23,7 +23,12 @@ function run!(e::Engine; channel::Channel = nothing)
     # Have shadows and reflection off by default
     _toggle!(e.ui.scn.flags, 1) #Shadow
     _toggle!(e.ui.scn.flags, 3) #Reflections
-    
+
+    # Show and label contact forces by default
+    e.ui.vopt.label = 14 # Label contact force
+    _toggle!(e.ui.vopt.flags, 16) # Show contact force
+    _toggle!(e.ui.vopt.flags, 17) # Show contact force
+
     # Render the first frame before opening window
     prepare!(e)
     e.ui.refreshrate = GetRefreshRate()
