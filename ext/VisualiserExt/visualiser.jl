@@ -4,7 +4,8 @@ function MuJoCo.Visualiser.visualise!(
     m::Model, d::Data; 
     controller = nothing, 
     trajectories = nothing,
-    channel::Channel = nothing
+    channel::Channel = nothing, 
+    preferred_monitor = nothing
 )
     modes = EngineMode[]
     !isnothing(controller) && push!(modes, Controller(controller))
@@ -12,14 +13,14 @@ function MuJoCo.Visualiser.visualise!(
     push!(modes, PassiveDynamics())
 
     phys = PhysicsState(m, d)
-    rendertask = Threads.@spawn run!(Engine(default_windowsize(), m, d, Tuple(modes), phys), channel = channel)
+    rendertask = Threads.@spawn run!(Engine(default_windowsize(), m, d, Tuple(modes), phys), channel = channel, preferred_monitor=preferred_monitor)
     return phys, rendertask
 end
 
 """
 Run the visualiser engine
 """
-function run!(e::Engine; channel::Channel = nothing)
+function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing)
     # Have shadows and reflection off by default
     _toggle!(e.ui.scn.flags, 1) #Shadow
     _toggle!(e.ui.scn.flags, 3) #Reflections
@@ -33,6 +34,14 @@ function run!(e::Engine; channel::Channel = nothing)
     prepare!(e)
     e.ui.refreshrate = GetRefreshRate()
     e.ui.lastrender = time()
+
+    # Set window position
+    if preferred_monitor !== nothing
+        monitor_pos = GLFW.GetMonitorPos(GLFW.GetMonitors()[preferred_monitor])
+        GLFW.SetWindowSize(e.manager.state.window, 1440, 810)
+        GLFW.SetWindowPos(e.manager.state.window, monitor_pos.x, monitor_pos.y)
+    end
+
     GLFW.ShowWindow(e.manager.state.window)
 
     # Run the simulation/mode in a different thread
