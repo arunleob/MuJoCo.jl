@@ -38,8 +38,9 @@ function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing
     # Set window position
     if preferred_monitor !== nothing
         monitor_pos = GLFW.GetMonitorPos(GLFW.GetMonitors()[preferred_monitor])
+        monitor_data = GLFW.GetVideoMode(GLFW.GetMonitors()[preferred_monitor])
         GLFW.SetWindowSize(e.manager.state.window, 1440, 810)
-        GLFW.SetWindowPos(e.manager.state.window, monitor_pos.x, monitor_pos.y)
+        GLFW.SetWindowPos(e.manager.state.window, Int(floor(monitor_pos.x + monitor_data.width/2 - 1440/2)), Int(floor(monitor_pos.y + monitor_data.height/2 - 810/2)))
     end
 
     GLFW.ShowWindow(e.manager.state.window)
