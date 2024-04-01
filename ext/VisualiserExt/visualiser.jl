@@ -5,7 +5,7 @@ function MuJoCo.Visualiser.visualise!(
     controller = nothing, 
     trajectories = nothing,
     channel::Channel = nothing, 
-    preferred_monitor = nothing
+    preferred_monitor::Int64 = nothing
 )
     modes = EngineMode[]
     !isnothing(controller) && push!(modes, Controller(controller))
@@ -20,7 +20,7 @@ end
 """
 Run the visualiser engine
 """
-function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing)
+function run!(e::Engine; channel::Channel = nothing, preferred_monitor::Int64 = nothing)
     # Have shadows and reflection off by default
     _toggle!(e.ui.scn.flags, 1) #Shadow
     _toggle!(e.ui.scn.flags, 3) #Reflections
@@ -36,7 +36,7 @@ function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing
     e.ui.lastrender = time()
 
     # Set window position
-    if preferred_monitor !== nothing
+    if preferred_monitor !== nothing && preferred_monitor > 0 && preferred_monitor <= length(GLFW.GetMonitors())
         monitor_pos = GLFW.GetMonitorPos(GLFW.GetMonitors()[preferred_monitor])
         monitor_data = GLFW.GetVideoMode(GLFW.GetMonitors()[preferred_monitor])
         GLFW.SetWindowSize(e.manager.state.window, 1440, 810)
