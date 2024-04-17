@@ -5,7 +5,7 @@ function MuJoCo.Visualiser.visualise!(
     controller = nothing, 
     trajectories = nothing,
     channel::Channel = nothing, 
-    preferred_monitor::Int64 = nothing
+    preferred_monitor = nothing
 )
     modes = EngineMode[]
     !isnothing(controller) && push!(modes, Controller(controller))
@@ -20,7 +20,7 @@ end
 """
 Run the visualiser engine
 """
-function run!(e::Engine; channel::Channel = nothing, preferred_monitor::Int64 = nothing)
+function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing)
     # Have shadows and reflection off by default
     _toggle!(e.ui.scn.flags, 1) #Shadow
     _toggle!(e.ui.scn.flags, 3) #Reflections
