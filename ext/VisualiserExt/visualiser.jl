@@ -36,7 +36,8 @@ function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing
     e.ui.lastrender = time()
 
     # Set window position
-    if preferred_monitor !== nothing && preferred_monitor > 0 && preferred_monitor <= length(GLFW.GetMonitors())
+    if preferred_monitor !== nothing
+        preferred_monitor = clamp(preferred_monitor, 1, length(GLFW.GetMonitors()))
         monitor_pos = GLFW.GetMonitorPos(GLFW.GetMonitors()[preferred_monitor])
         monitor_data = GLFW.GetVideoMode(GLFW.GetMonitors()[preferred_monitor])
         GLFW.SetWindowSize(e.manager.state.window, 1440, 810)
