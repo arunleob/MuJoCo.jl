@@ -5,15 +5,24 @@ function MuJoCo.Visualiser.visualise!(
     controller = nothing, 
     trajectories = nothing,
     channel::Channel = nothing, 
-    preferred_monitor = nothing
+    preferred_monitor = nothing,
+    resolution::Union{Tuple{Integer, Integer}, Nothing} = nothing
 )
     modes = EngineMode[]
     !isnothing(controller) && push!(modes, Controller(controller))
     !isnothing(trajectories) && push!(modes, Trajectory(trajectories))
     push!(modes, PassiveDynamics())
 
+    window_size = if isnothing(resolution)
+        default_windowsize()
+    else
+        @assert resolution[1] > 0 "Width of resolution should be greater than 0."
+        @assert resolution[2] > 0 "Height of resolution should be greater than 0."
+        resolution
+    end
+
     phys = PhysicsState(m, d)
-    rendertask = Threads.@spawn run!(Engine(default_windowsize(), m, d, Tuple(modes), phys), channel = channel, preferred_monitor=preferred_monitor)
+    rendertask = Threads.@spawn run!(Engine(window_size, m, d, Tuple(modes), phys), channel = channel, preferred_monitor=preferred_monitor)
     return phys, rendertask
 end
 
