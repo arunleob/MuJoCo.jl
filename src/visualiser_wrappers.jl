@@ -445,17 +445,17 @@ function Base.setproperty!(x::VisualiserCamera, f::Symbol, value)
     end
     if f === :distance
         cvalue = convert(Float64, value)
-        unsafe_store!(Ptr{Float64}(internal_pointer + 12), cvalue)
+        unsafe_store!(Ptr{Float64}(internal_pointer + 40), cvalue)
         return cvalue
     end
     if f === :azimuth
         cvalue = convert(Float64, value)
-        unsafe_store!(Ptr{Float64}(internal_pointer + 20), cvalue)
+        unsafe_store!(Ptr{Float64}(internal_pointer + 48), cvalue)
         return cvalue
     end
     if f === :elevation
         cvalue = convert(Float64, value)
-        unsafe_store!(Ptr{Float64}(internal_pointer + 28), cvalue)
+        unsafe_store!(Ptr{Float64}(internal_pointer + 56), cvalue)
         return cvalue
     end
     if f in (:lookat,)

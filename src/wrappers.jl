@@ -6263,7 +6263,7 @@ function Base.setproperty!(x::Data, f::Symbol, value)
     end
     if f === :time
         cvalue = convert(Float64, value)
-        unsafe_store!(Ptr{Float64}(internal_pointer + 100), cvalue)
+        unsafe_store!(Ptr{Float64}(internal_pointer + 161616), cvalue)
         return cvalue
     end
     if f === :threadpool
