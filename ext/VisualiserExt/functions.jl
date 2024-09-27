@@ -15,6 +15,8 @@ function alignscale!(ui::UIState, m::Model)
     ui.cam.lookat .= m.stat.center
     ui.cam.distance = 1.5 * m.stat.extent
     ui.cam.type = LibMuJoCo.mjCAMERA_FREE
+    ui.cam.azimuth = m.vis._global.azimuth
+    ui.cam.elevation = m.vis._global.elevation
     return ui
 end
 
