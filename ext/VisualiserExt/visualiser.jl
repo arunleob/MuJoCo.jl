@@ -6,7 +6,8 @@ function MuJoCo.Visualiser.visualise!(
     trajectories = nothing,
     channel::Channel = nothing, 
     preferred_monitor = nothing,
-    resolution::Union{Tuple{Integer, Integer}, Nothing} = nothing
+    resolution::Union{Tuple{Integer, Integer}, Nothing} = nothing,
+    run_threaded = true
 )
     modes = EngineMode[]
     !isnothing(controller) && push!(modes, Controller(controller))
@@ -16,21 +17,27 @@ function MuJoCo.Visualiser.visualise!(
     window_size = if isnothing(resolution)
         default_windowsize()
     else
-        @assert resolution[1] > 0 "Width of resolution should be greater than 0."
+                @assert resolution[1] > 0 "Width of resolution should be greater than 0."
         @assert resolution[2] > 0 "Height of resolution should be greater than 0."
         resolution
     end
 
     phys = PhysicsState(m, d)
-    rendertask = Threads.@spawn run!(Engine(window_size, m, d, Tuple(modes), phys), channel = channel, preferred_monitor=preferred_monitor)
-    return phys, rendertask
+    if run_threaded
+        GLFW.ENABLE_THREAD_ASSERTIONS[] = false # Make sure we can run threaded
+        rendertask = Threads.@spawn run!(Engine(window_size, m, d, Tuple(modes), phys), channel = channel, preferred_monitor=preferred_monitor)
+        return phys, rendertask
+    else
+        run!(Engine(window_size, m, d, Tuple(modes), phys), channel = channel, preferred_monitor=preferred_monitor)
+        return nothing
+    end
 end
 
 """
 Run the visualiser engine
 """
 function run!(e::Engine; channel::Channel = nothing, preferred_monitor = nothing)
-    # Have shadows and reflection off by default
+        # Have shadows and reflection off by default
     _toggle!(e.ui.scn.flags, 1) #Shadow
     _toggle!(e.ui.scn.flags, 3) #Reflections
 
